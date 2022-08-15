@@ -87,65 +87,102 @@ app.MapDelete("recipes/delete-recipe/{id}", async (Guid id) =>
     bool isRemoved=recipes.Remove(recipes.Find(r => r.Id == id));
     if(!isRemoved)
     {
-       return Results.BadRequest();
+       return Results.BadRequest("This recipe does not exist.");
     }
     else 
     { 
        UpdateFile(recipes);
-       return Results.Ok();
+       return Results.Ok("Successfuly deleted");
     }
 
+});
+
+// Adding a category.
+app.MapPost("recipes/add-category", async (Categories category) =>
+{
+    List<Categories> categories =await ReadCategories();
+    if (categories.Any())
+    {
+        categories.Add(category);
+        UpdateCategories(categories);
+        return Results.Created("Successfully added a category",category);
+    }
+    return Results.BadRequest();
 });
 
 // Renaming a category.
 app.MapPut("recipes/rename-category", async (string oldName, string newName) =>
 {
-    List<Recipe> recipes = await ReadFile();
-    List<Recipe> beforeRename = recipes.FindAll(r => r.Categories.Contains(oldName));
-    if (beforeRename.Any())
+    // Renaming category in the categories file.
+    List<Categories> categories =await ReadCategories();
+    int index = categories.FindIndex(c => c.Name == oldName);
+    if (index != -1)
     {
-        foreach (Recipe r in beforeRename)
-        {
-            int index = r.Categories.FindIndex(cat => cat == oldName);
+        categories[index].Name = newName;
+        UpdateCategories(categories);
 
-            if (index != -1)
-                r.Categories[index] = newName;
-        }
+        // Renaming category in the recipes file.
+        List<Recipe> recipes = await ReadFile();
+        List<Recipe> beforeRename = recipes.FindAll(r => r.Categories.Contains(oldName));
+        if (beforeRename.Any())
+        {
+            foreach (Recipe r in beforeRename)
+            {
+                int i = r.Categories.FindIndex(cat => cat == oldName);
+                if (i != -1)
+                {
+                    r.Categories[index] = newName;
+                }
+            }
         UpdateFile(recipes);
+        }
         return Results.Ok("Successfully updated");
     }
-    return Results.BadRequest("This category does not exist.");
+    else
+    {
+        return Results.BadRequest("This category does not exist.");
+    }
 });
 
 // Removing a category.
 app.MapDelete("recipes/remove-category/{category}", async (string category) =>
 {
-    List<Recipe> recipes = await ReadFile();
-    bool found = false;
+    // Removing from the categories file.
+    List<Categories> categories =await ReadCategories();
+    bool isRemoved=categories.Remove(categories.Find(c => c.Name == category));
+    if(!isRemoved)
+    {
+       return Results.BadRequest("This category does not exist.");
+    }
+    else 
+    { 
+       UpdateCategories(categories);
+       // Removing from the recipes file.
+       List<Recipe> recipes = await ReadFile();
+       bool foundRecipe = false;
 
-    foreach (Recipe r in recipes.ToList())
-    {
-        if (r.Categories[0] == category && r.Categories.Count == 1)
-        {
-            Console.WriteLine("hnaaa");
-            found = true;
-            recipes.Remove(r);
-        }
-        else
-        {
-            if (r.Categories.Contains(category))
+       foreach (Recipe r in recipes.ToList())
+       {
+            if (r.Categories[0] == category && r.Categories.Count == 1)
             {
-                found = true;
-                r.Categories.Remove(category);
+                foundRecipe = true;
+                recipes.Remove(r);
             }
-        }
+            else
+            {
+                if (r.Categories.Contains(category))
+                {
+                    foundRecipe = true;
+                    r.Categories.Remove(category);
+                }
+            }
+       }
+       if (foundRecipe)
+       {
+           UpdateFile(recipes);
+       }
+       return Results.Ok("Successfuly deleted.");
     }
-    if (found)
-    {
-        UpdateFile(recipes);
-        return Results.Ok("Successfully deleted");
-    }
-    return Results.BadRequest("This category does not exist.");
 });
 
 // Getting the json file content to display it.
@@ -158,22 +195,13 @@ app.MapGet("recipes", async () =>
 // Getting the json file content of the categories.
 app.MapGet("categories", async () =>
 {
-    List<Recipe> recipes = await ReadFile();
-    List<string> categories = new();
-    for (int i = 0; i < recipes.Count; i++)
-    {
-        for (int y = 0; y < recipes[i].Categories.Count; y++)
-        {
-            if (!categories.Contains(recipes[i].Categories[y]))
-                categories.Add(recipes[i].Categories[y]);
-        }
-    }
-    return Results.Ok(categories);
+    List<Categories> recipes =await ReadCategories();
+    return Results.Ok(recipes);
 });
 app.UseCors(MyAllowSpecificOrigins);
 app.Run();
 
-// Reading the json file content.
+// Reading the recipes json file content.
 static async Task<List<Recipe>> ReadFile()
 {
     string sCurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
@@ -184,11 +212,32 @@ static async Task<List<Recipe>> ReadFile()
     return menu;
 }
 
-// Updating the json file content.
+// Reading the categories json file content.
+static async Task<List<Categories>> ReadCategories()
+{
+    string sCurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+    string sFile = System.IO.Path.Combine(sCurrentDirectory, @"..\..\..\" + "Categories.json");
+    string sFilePath = Path.GetFullPath(sFile);
+    string jsonString = await File.ReadAllTextAsync(sFilePath);
+    List<Categories>? menu = System.Text.Json.JsonSerializer.Deserialize<List<Categories>>(jsonString);
+    return menu;
+}
+
+// Updating the recipes json file content.
 static async void UpdateFile(List<Recipe> newRecipes)
 {
     string sCurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
     string sFile = System.IO.Path.Combine(sCurrentDirectory, @"..\..\..\" + "Text.json");
+    string sFilePath = Path.GetFullPath(sFile);
+    var options = new JsonSerializerOptions { WriteIndented = true };
+    File.WriteAllText(sFilePath, System.Text.Json.JsonSerializer.Serialize(newRecipes));
+}
+
+// Updating the categories json file content.
+static async void UpdateCategories(List<Categories> newRecipes)
+{
+    string sCurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+    string sFile = System.IO.Path.Combine(sCurrentDirectory, @"..\..\..\" + "Categories.json");
     string sFilePath = Path.GetFullPath(sFile);
     var options = new JsonSerializerOptions { WriteIndented = true };
     File.WriteAllText(sFilePath, System.Text.Json.JsonSerializer.Serialize(newRecipes));
