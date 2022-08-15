@@ -1,21 +1,5 @@
 [
   {
-    "Id": "8d3d8f75-5832-4d23-9d78-4b81b92a2077",
-    "Ingredients": [
-      "milk",
-      "cocoa powder",
-      " cream"
-    ],
-    "Title": "Chocolate milkshake",
-    "Instructions": [
-      "put the milk and cocoa powder in a blender",
-      " top with whipped cream"
-    ],
-    "Categories": [
-      "Brunch"
-    ]
-  },
-  {
     "Id": "cd949b43-d459-4077-a796-df7efd50b481",
     "Ingredients": [
       "1 cup white long-grain rice",
@@ -36,6 +20,7 @@
       "Add bacon to wok. Cook 4 minutes until light golden. Add carrot . Stir fry 1 minute. Add shallots , peas and rice. Cook, stirring, 3 to 4 minutes. Add egg and soy sauce . Stir until heated through. Sprinkle with sesame seeds and top with extra shallots . Serve immediately."
     ],
     "Categories": [
+      "Dinner"
     ]
   },
   {

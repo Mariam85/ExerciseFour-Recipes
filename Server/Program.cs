@@ -2,23 +2,23 @@ using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
-using IHost host = Host.CreateDefaultBuilder(args).Build();
-IConfiguration config = host.Services.GetRequiredService<IConfiguration>();
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddCors();
-var app = builder.Build();
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
-app.UseSwagger();
-app.UseSwaggerUI(options =>
+
+
+builder.Services.AddCors(options =>
 {
-    options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-    options.RoutePrefix = string.Empty;
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy =>
+                      {
+                          policy.WithOrigins("https://localhost:7117")
+                                                .AllowAnyHeader()
+                                                .AllowAnyMethod()
+                                                .AllowAnyOrigin();
+                      });
 });
-
-app.UseCors(options => options.WithOrigins(config.GetValue<string>("url")).AllowAnyHeader().AllowAnyMethod());
-
+var app = builder.Build();
 // Adding a recipe.
 app.MapPost("recipes/add-recipe", async (Recipe recipe) =>
 {
@@ -78,6 +78,23 @@ app.MapGet("recipes/list-recipe/{title}", async (string title) =>
         return Results.NotFound();
     else
         return Results.Ok(foundRecipes);
+});
+
+// Deleting a recipe
+app.MapDelete("recipes/delete-recipe/{id}", async (Guid id) =>
+{
+    List<Recipe> recipes = await ReadFile();
+    bool isRemoved=recipes.Remove(recipes.Find(r => r.Id == id));
+    if(!isRemoved)
+    {
+       return Results.BadRequest();
+    }
+    else 
+    { 
+       UpdateFile(recipes);
+       return Results.Ok();
+    }
+
 });
 
 // Renaming a category.
@@ -153,7 +170,7 @@ app.MapGet("categories", async () =>
     }
     return Results.Ok(categories);
 });
-
+app.UseCors(MyAllowSpecificOrigins);
 app.Run();
 
 // Reading the json file content.
