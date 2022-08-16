@@ -111,7 +111,7 @@ app.MapPost("recipes/add-category", async (Categories category) =>
 });
 
 // Renaming a category.
-app.MapPut("recipes/rename-category", async (string oldName, string newName) =>
+app.MapPut("categories/rename-category", async (string oldName, string newName) =>
 {
     // Renaming category in the categories file.
     List<Categories> categories =await ReadCategories();
@@ -124,14 +124,14 @@ app.MapPut("recipes/rename-category", async (string oldName, string newName) =>
         // Renaming category in the recipes file.
         List<Recipe> recipes = await ReadFile();
         List<Recipe> beforeRename = recipes.FindAll(r => r.Categories.Contains(oldName));
-        if (beforeRename.Any())
+        if (beforeRename.Count!=0)
         {
             foreach (Recipe r in beforeRename)
             {
                 int i = r.Categories.FindIndex(cat => cat == oldName);
                 if (i != -1)
                 {
-                    r.Categories[index] = newName;
+                    r.Categories[i] = newName;
                 }
             }
         UpdateFile(recipes);

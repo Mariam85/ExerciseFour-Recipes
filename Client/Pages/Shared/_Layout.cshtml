@@ -7,6 +7,11 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Client.styles.css" asp-append-version="true" />
+    <script>
+        function refreshPage() {
+            window.location.reload();
+        }
+    </script>
 </head>
 <body x-data="{ tab: 'recipes' }">
     <header>
@@ -20,7 +25,7 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link" style="cursor: pointer;" x-on:click="tab = 'recipes'">Recipes</a>
+                            <a class="nav-link" style="cursor: pointer;" x-on:click="tab = 'recipes' , refreshPage();">Recipes</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" style="cursor: pointer;" x-on:click="tab = 'categories'">Categories</a>
