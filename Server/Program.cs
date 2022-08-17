@@ -33,40 +33,19 @@ app.MapPost("recipes/add-recipe", async (Recipe recipe) =>
 });
 
 // Editing a recipe.
-app.MapPut("recipes/edit-recipe/{id}", async (Guid id, string attributeName, string editedParameter) =>
+app.MapPut("recipes/edit-recipe/{id}", async (Guid id, Recipe editedrecipe) =>
 {
     // Input format -value \n -value.
     List<Recipe> recipes = await ReadFile();
-
-    List<string> newValue = editedParameter.Split("-").ToList();
-    newValue.Remove(newValue[0]);
-    for (int i = 0; i < newValue.Count(); i++)
+    int index = recipes.FindIndex(r => r.Id == id);
+    if(index!=-1)
     {
-        newValue[i] = newValue[i].Trim();
+        recipes[index]=editedrecipe;
+       UpdateFile(recipes);
+       return Results.Ok(recipes.Find(r => r.Id == id));
     }
-
-    if (attributeName == "Title")
-    {
-        recipes.Find(r => r.Id == id).Title = editedParameter;
-    }
-    else if (attributeName == "Instructions")
-    {
-        recipes.Find(r => r.Id == id).Instructions = newValue;
-    }
-    else if (attributeName == "Ingredients")
-    {
-        recipes.Find(r => r.Id == id).Ingredients = newValue;
-    }
-    else if (attributeName == "Categories")
-    {
-        recipes.Find(r => r.Id == id).Categories = newValue;
-    }
-    else
-    {
         return Results.BadRequest();
-    }
-    UpdateFile(recipes);
-    return Results.Ok(recipes.Find(r => r.Id == id));
+   
 });
 
 // Listing a recipe.
