@@ -15,25 +15,9 @@
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
-<script type="text/javascript">
-    function myfunction() {
-        let deleted = await deleteRecipe(recipe.id)
-        if (deleted) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Successfully deleted!',
-                showConfirmButton: false,
-            });
-        }
-        else {
-            {
-                Swal.fire('No changes are applied', '', 'info');
-            }
-        }
-    }
-</script>
 <script>
 
+    // Editing recipes.
     async function editRecipe(recipe) {
         let ingredients = recipe.ingredients.replaceAll('\n', '').split('• ');
         ingredients.shift();
@@ -64,16 +48,16 @@
                 location.reload();
             });
         }
-
         else {
             Swal.fire({
                 title: 'No changes are applied!',
                 icon: 'info',
                 confirmButtonColor: '#0275d8'
-            })
+            });
         }
     }
 
+    // Listing recipes.
     async function getRecipes() {
         return await fetch('https://localhost:7187/recipes', {
             method: 'GET',
@@ -87,6 +71,7 @@
             })
     }
 
+    // Listing categories.
     async function getCategories() {
         return await fetch('https://localhost:7187/categories', {
             method: 'GET',
@@ -100,6 +85,7 @@
             })
     }
 
+    // Deleting a recipe.
     async function deleteRecipe(recipe, title) {
         let response = await fetch('https://localhost:7187/recipes/delete-recipe/' + recipe, {
             method: 'DELETE',
@@ -118,7 +104,6 @@
                 location.reload();
             });
         }
-
         else {
             Swal.fire({
                 title: 'No changes are applied!',
@@ -128,6 +113,7 @@
         }
     }
 
+    // Deleting a category.
     async function removeCategory(oldCategory) {
         let response = await fetch('https://localhost:7187/recipes/remove-category/' + oldCategory, {
             method: 'DELETE',
@@ -144,7 +130,6 @@
 
             });
         }
-
         else {
             Swal.fire({
                 title: 'No changes are applied!',
@@ -154,6 +139,7 @@
         }
     }
 
+    // Adding a category.
     async function addCategory(category) {
         let response = await fetch('https://localhost:7187/recipes/add-category/', {
             method: 'POST',
@@ -173,7 +159,6 @@
 
             });
         }
-
         else {
             Swal.fire({
                 title: 'Could not add category!',
@@ -181,9 +166,9 @@
                 confirmButtonColor: '#0275d8'
             })
         }
-
     }
 
+    // Renaming a category.
     async function renameCategory(name, newName) {
         let url = 'https://localhost:7187/categories/rename-category?oldName=' + name + '&newName=' + newName;
         let response = await fetch(url, {
@@ -200,7 +185,6 @@
                 confirmButtonColor: '#0275d8'
             });
         }
-
         else {
             Swal.fire({
                 title: 'No changes are applied!',
@@ -210,6 +194,7 @@
         }
     }
 </script>
+
 <body style="size: 1040px; height: 960px; background: url('https://images.unsplash.com/photo-1614548539644-ef528186523a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80') no-repeat; background-size: cover ">
     @* Recipes*@
     <div x-show="tab == 'recipes'">
@@ -287,7 +272,6 @@
                                                     </div>
                                                 </div>
                                             </div>
-
                                             <div class="modal-footer">
                                                 <button data-bs-dismiss="modal" type="submit" id="button" class="btn btn-primary">Edit</button>
                                             </div>
@@ -482,7 +466,6 @@
                                             </div>
                                         </div>
                                     </div>
-
                                     <div class="modal fade" :id="'removeCategoryModal' + category.name;" tabindex="-1" aria-labelledby="removeCategoryModalLabel" aria-hidden="true">
                                         <div class="modal-dialog">
                                             <div class="modal-content">
@@ -513,7 +496,6 @@
                                             </div>
                                         </div>
                                     </div>
-
                                     <div class="modal fade" :id="'addCategoryModal'" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
                                         <div class="modal-dialog">
                                             <div class="modal-content">

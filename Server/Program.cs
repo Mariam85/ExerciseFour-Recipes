@@ -2,23 +2,25 @@ using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
+IConfiguration config = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json")
+    .AddEnvironmentVariables()
+    .Build();
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-
-
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: MyAllowSpecificOrigins,
                       policy =>
                       {
-                          policy.WithOrigins("https://localhost:7117")
+                          policy.WithOrigins(config["url"])
                                                 .AllowAnyHeader()
                                                 .AllowAnyMethod()
                                                 .AllowAnyOrigin();
                       });
 });
 var app = builder.Build();
+
 // Adding a recipe.
 app.MapPost("recipes/add-recipe", async (Recipe recipe) =>
 {
@@ -33,14 +35,14 @@ app.MapPost("recipes/add-recipe", async (Recipe recipe) =>
 });
 
 // Editing a recipe.
-app.MapPut("recipes/edit-recipe/{id}", async (Guid id, Recipe editedrecipe) =>
+app.MapPut("recipes/edit-recipe/{id}", async (Guid id, Recipe editedRecipe) =>
 {
     // Input format -value \n -value.
     List<Recipe> recipes = await ReadFile();
     int index = recipes.FindIndex(r => r.Id == id);
     if(index!=-1)
     {
-        recipes[index]=editedrecipe;
+        recipes[index]=editedRecipe;
        UpdateFile(recipes);
        return Results.Ok(recipes.Find(r => r.Id == id));
     }
@@ -59,7 +61,7 @@ app.MapGet("recipes/list-recipe/{title}", async (string title) =>
         return Results.Ok(foundRecipes);
 });
 
-// Deleting a recipe
+// Deleting a recipe.
 app.MapDelete("recipes/delete-recipe/{id}", async (Guid id) =>
 {
     List<Recipe> recipes = await ReadFile();
@@ -139,7 +141,6 @@ app.MapDelete("recipes/remove-category/{category}", async (string category) =>
        // Removing from the recipes file.
        List<Recipe> recipes = await ReadFile();
        bool foundRecipe = false;
-
        foreach (Recipe r in recipes.ToList())
        {
             if (r.Categories[0] == category && r.Categories.Count == 1)
