@@ -195,7 +195,7 @@
     }
 </script>
 
-<body style="size: 1040px; height: 960px; background: url('https://images.unsplash.com/photo-1614548539644-ef528186523a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80') no-repeat; background-size: cover ">
+<body style="background: url('https://images.unsplash.com/photo-1614548539644-ef528186523a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80')no-repeat; background-size: cover ">
     @* Recipes*@
     <div x-show="tab == 'recipes'">
         <div x-init="recipes = await getRecipes()"
@@ -208,12 +208,12 @@
                     <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
                 </svg>Add
             </button>
-            <div id="carouselExampleSlidesOnly" class="hover-zoom text-center  carousel slide" data-bs-ride="carousel">
+            <div id="carousel" class="hover-zoom text-center  carousel slide" data-bs-ride="carousel">
                 <template x-for="recipe in recipes">
                     <div>
                         <div class="hover-zoom carousel-inner">
-                            <div class="carousel-item active">
-                                <button class="border-0 mt-3 zoom  cards  card-body border-1" data-bs-toggle="modal" :data-bs-target="'#detailsModal' + recipe.id">
+                            <div class="item active">
+                                <button style="border-radius: 12px;height: 400px;" class="border-0 mt-3 zoom  cards  card-body border-1" data-bs-toggle="modal" :data-bs-target="'#detailsModal' + recipe.id">
                                     <h4 x-text="recipe.title" class="cta card-title" style="color:black"></h4>
                                     <template x-for="category in recipe.categories">
                                         <span style="text-align:left; background-color:#00008B" class="badge mb-2 mx-1" x-text="category"></span>

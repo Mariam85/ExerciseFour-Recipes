@@ -242,7 +242,8 @@ body {
 
 /* width */
 ::-webkit-scrollbar {
-    width: 20px;
+    width: 5px;
+    display: block;
 }
 
 /* Track */
@@ -253,12 +254,29 @@ body {
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-    background: #5bc0de;
+    background: #808080;
     border-radius: 10px;
 }
 
-    /* Handle on hover */
     ::-webkit-scrollbar-thumb:hover {
-        background: #00008B;
+        background: #63666A;
     }
 
+#carousel {
+    display: flex;
+    overflow-x: auto;
+    -ms-overflow-style: none; /* Hide the scrollbar for MS Edge */
+    margin: 0 auto 0 auto;
+    width: 90vw;
+    height: fit-content;
+}
+
+    #carousel::-webkit-scrollbar {
+        -webkit-overflow-scrolling: touch; /* On touch screens the content continues to scroll for a while after finishing the scroll gesture */
+    }
+
+.item {
+    min-width: 300px;
+    min-height: 20vh;
+    margin: 15px;
+}

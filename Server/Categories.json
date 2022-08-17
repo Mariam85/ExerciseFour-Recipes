@@ -1,6 +1,1 @@
-[
-  { "Name": "Appetizer" },
-  { "Name": "Lunch" },
-  { "Name": "Brunch" },
-  { "Name": "Dessert" }
-]
+[{"Name":"Appetizer"},{"Name":"Lunch"}]
