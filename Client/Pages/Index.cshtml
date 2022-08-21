@@ -15,230 +15,6 @@
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
-<script>
-    document.addEventListener('alpine:init', () => {
-        Alpine.store('recipes', getRecipes());
-        Alpine.store('cat', getCategories());
-    });
-
-    // Adding a recipe.
-    async function addRecipe(recipe) {
-        let ingredients = recipe.ingredients.replaceAll('\n', '').split('• ');
-        ingredients.shift();
-        let instructions = recipe.instructions.replaceAll('\n', '').split('• ');
-        instructions.shift();
-        let response = await fetch('https://localhost:7187/recipes/add-recipe/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                id: recipe.id,
-                ingredients: ingredients,
-                title: recipe.title,
-                instructions: instructions,
-                categories: recipe.categories
-            })
-        })
-        if (response.ok) {
-            Swal.fire({
-                title: 'Success!',
-                text: recipe.title + ' is successfuly added!',
-                icon: 'success',
-                confirmButtonColor: '#0275d8'
-
-            });
-            Alpine.store('recipes', getRecipes());
-        }
-        else {
-            Swal.fire({
-                title: 'Could not add category!',
-                icon: 'info',
-                confirmButtonColor: '#0275d8'
-            })
-        } 
-    }
-
-    // Editing recipes.
-    async function editRecipe(recipe) {
-        let ingredients = recipe.ingredients.replaceAll('\n', '').split('• ');
-        ingredients.shift();
-        let instructions = recipe.instructions.replaceAll('\n', '').split('• ');
-        instructions.shift();
-        let url = 'https://localhost:7187/recipes/edit-recipe/' + recipe.id;
-        let response = await fetch(url, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                id: recipe.id,
-                ingredients: ingredients,
-                title: recipe.title,
-                instructions: instructions,
-                categories: recipe.categories
-            })
-        });
-        if (response.ok) {
-            Swal.fire({
-                title: 'Success!',
-                text: 'recipe is successfuly edited!',
-                icon: 'success',
-                confirmButtonColor: '#0275d8'
-
-            })
-            Alpine.store('recipes', getRecipes());
-        }
-        else {
-            Swal.fire({
-                title: 'No changes are applied!',
-                icon: 'info',
-                confirmButtonColor: '#0275d8'
-            });
-        }
-    }
-
-    // Listing recipes.
-    async function getRecipes() {
-        return await fetch('https://localhost:7187/recipes', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(res => res.json())
-            .then(data => {
-                return data
-            })
-    }
-
-    // Listing categories.
-    async function getCategories() {
-        return await fetch('https://localhost:7187/categories', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(res => res.json())
-            .then(data => {
-                return data
-            })
-    }
-
-    // Deleting a recipe.
-    async function deleteRecipe(recipe) {
-        let response = await fetch('https://localhost:7187/recipes/delete-recipe/' + recipe, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        if (response.ok) {
-            Alpine.store('recipes', getRecipes());
-            Swal.fire({
-                title: 'Success!',
-                text: 'successfuly deleted!',
-                icon: 'success',
-                confirmButtonColor: '#0275d8'
-            })
-        }
-        else {
-            Swal.fire({
-                title: 'No changes are applied!',
-                icon: 'info',
-                confirmButtonColor: '#0275d8'
-            })
-        }
-    }
-
-    // Deleting a category.
-    async function removeCategory(oldCategory) {
-        let response = await fetch('https://localhost:7187/recipes/remove-category/' + oldCategory, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        if (response.ok) {
-            Swal.fire({
-                title: 'Success!',
-                text: oldCategory + ' is deleted!',
-                icon: 'success',
-                confirmButtonColor: '#0275d8'
-
-            });
-            Alpine.store('cat', getCategories());
-            Alpine.store('recipes', getRecipes());
-        }
-        else {
-            Swal.fire({
-                title: 'No changes are applied!',
-                icon: 'info',
-                confirmButtonColor: '#0275d8'
-            })
-        }
-    }
-
-    // Adding a category.
-    async function addCategory(category) {
-        let response = await fetch('https://localhost:7187/recipes/add-category/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                Name: category
-            })
-        })
-        if (response.ok) {
-            Swal.fire({
-                title: 'Success!',
-                text: category + ' is successfuly added!',
-                icon: 'success',
-                confirmButtonColor: '#0275d8'
-
-            });
-            Alpine.store('cat', getCategories());
-        }
-        else {
-            Swal.fire({
-                title: 'Could not add category!',
-                icon: 'info',
-                confirmButtonColor: '#0275d8'
-            })
-        }
-    }
-
-    // Renaming a category.
-    async function renameCategory(name, newName) {
-        let url = 'https://localhost:7187/categories/rename-category?oldName=' + name + '&newName=' + newName;
-        let response = await fetch(url, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        if (response.ok) {
-            Swal.fire({
-                title: 'Success!',
-                text: name + ' is renamed to ' + newName + '!',
-                icon: 'success',
-                confirmButtonColor: '#0275d8'
-            });
-            Alpine.store('cat', getCategories());
-            Alpine.store('recipes', getRecipes());
-        }
-        else {
-            Swal.fire({
-                title: 'No changes are applied!',
-                icon: 'info',
-                confirmButtonColor: '#0275d8'
-            });
-        }
-    }
-</script>
-
 <body style="background: url('https://images.unsplash.com/photo-1614548539644-ef528186523a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80')no-repeat; background-size: cover ">
     @* Recipes*@
     <div x-show="tab == 'recipes'">
@@ -249,7 +25,7 @@
                 <h1 style="font-family: Lucida Sans Unicode;">Find and share recipes</h1>
             </header>
             <button class="button--nina" style="border-radius: 12px;font-family: Arial;" data-bs-toggle="modal" data-bs-target="#createRecipeModal">
-                <svg class="bi bi-type-bold" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                <svg class="bi bi-type-bold" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                     <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
                 </svg>Add
             </button>
@@ -515,7 +291,7 @@
                                                         <div>
                                                             <label for="editCategoryTitle" class="col-form-label fw-bold ">Enter the new name</label>&nbsp
                                                             <div class="col-10">
-                                                                <input id="editCategoryTitle" x-model="editedCategory" class="form-control" required />
+                                                                <input id="editCategoryTitle" x-model="editedCategory" class="form-control" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -536,9 +312,8 @@
                                                     <h5 class="modal-title" style="color:#00008B;">Remove category</h5>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
-                                                <form style="text-align:center;" x-on:submit.prevent="await removeCategory(oldCategory);cat = await getCategories();"
-                                                      x-data="{oldCategory: ''}"
-                                                      x-effect="oldCategory=category.name;">
+                                                <form style="text-align:center;" x-on:submit.prevent="await removeCategory(category.name);cat = await getCategories();"
+                                                      >
                                                     <div class="modal-body">
                                                         <div>
                                                             <label class="col-form-label fw-bold ">Are you sure you want to delete this category?</label>
@@ -572,7 +347,7 @@
                                                         <div>
                                                             <label for="editCategoryTitle" class="col-form-label fw-bold ">Enter category's name</label>&nbsp
                                                             <div class="col-10">
-                                                                <input id="newCategoryTitle" x-model="newCategory" class="form-control" required />
+                                                                <input id="newCategoryTitle" x-model="newCategory" class="form-control" />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -593,5 +368,280 @@
         </div>
     </div>
 </body>
+
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.store('recipes', getRecipes());
+        Alpine.store('cat', getCategories());
+    });
+
+    // Adding a recipe.
+    async function addRecipe(recipe) {
+        // Checking that all the textboxes are filled.
+        if (recipe.title.trim().length === 0 || recipe.ingredients.trim().length === 0 || recipe.instructions.trim().length === 0 || recipe.categories.length === 0)
+        {
+            Swal.fire({
+                icon: 'error',
+                title: 'Not all of the parameters are filled...',
+                text: `please fill out the text boxes`,
+                confirmButtonColor: '#0275d8'
+            })
+        }
+        else
+        {
+            let ingredients = recipe.ingredients.replaceAll('\n', '').split('• ');
+            ingredients.shift();
+            let instructions = recipe.instructions.replaceAll('\n', '').split('• ');
+            instructions.shift();
+
+            let response = await fetch('https://localhost:7187/recipes/add-recipe/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id: recipe.id,
+                    ingredients: ingredients,
+                    title: recipe.title,
+                    instructions: instructions,
+                    categories: recipe.categories
+                })
+            })
+            if (response.ok) {
+                Swal.fire({
+                    title: 'Success!',
+                    text: recipe.title + ' is successfuly added!',
+                    icon: 'success',
+                    confirmButtonColor: '#0275d8'
+
+                });
+                Alpine.store('recipes', getRecipes());
+            }
+            else {
+                Swal.fire({
+                    title: 'Could not add category!',
+                    icon: 'info',
+                    confirmButtonColor: '#0275d8'
+                })
+            }
+        }
+    }
+
+    // Editing recipes.
+    async function editRecipe(recipe) {
+
+        // Checking that all the textboxes are filled.
+        if (recipe.title.trim().length === 0 || recipe.ingredients.trim().length === 0 || recipe.instructions.trim().length === 0 || recipe.categories.length === 0)
+        {
+            Swal.fire({
+                icon: 'error',
+                title: 'Not all of the parameters are filled...',
+                text: `please fill out the text boxes`,
+                confirmButtonColor: '#0275d8'
+            })
+        }
+        else
+        {
+            let ingredients = recipe.ingredients.replaceAll('\n', '').split('• ');
+            ingredients.shift();
+            let instructions = recipe.instructions.replaceAll('\n', '').split('• ');
+            instructions.shift();
+            let url = 'https://localhost:7187/recipes/edit-recipe/' + recipe.id;
+            let response = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id: recipe.id,
+                    ingredients: ingredients,
+                    title: recipe.title,
+                    instructions: instructions,
+                    categories: recipe.categories
+                })
+            });
+            if (response.ok) {
+                Swal.fire({
+                    title: 'Success!',
+                    text: 'recipe is successfuly edited!',
+                    icon: 'success',
+                    confirmButtonColor: '#0275d8'
+
+                })
+                Alpine.store('recipes', getRecipes());
+            }
+            else {
+                Swal.fire({
+                    title: 'No changes are applied!',
+                    icon: 'info',
+                    confirmButtonColor: '#0275d8'
+                });
+            }
+        }
+    }
+
+    // Listing recipes.
+    async function getRecipes() {
+        return await fetch('https://localhost:7187/recipes', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                return data
+            })
+    }
+
+    // Listing categories.
+    async function getCategories() {
+        return await fetch('https://localhost:7187/categories', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(res => res.json())
+            .then(data => {
+                return data
+            })
+    }
+
+    // Deleting a recipe.
+    async function deleteRecipe(recipe) {
+        let response = await fetch('https://localhost:7187/recipes/delete-recipe/' + recipe, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        if (response.ok) {
+            Alpine.store('recipes', getRecipes());
+            Swal.fire({
+                title: 'Success!',
+                text: 'successfuly deleted!',
+                icon: 'success',
+                confirmButtonColor: '#0275d8'
+            })
+        }
+        else {
+            Swal.fire({
+                title: 'No changes are applied!',
+                icon: 'info',
+                confirmButtonColor: '#0275d8'
+            })
+        }
+    }
+
+    // Deleting a category.
+    async function removeCategory(oldCategory) {
+        let url = 'https://localhost:7187/recipes/remove-category/' + oldCategory;
+        let response = await fetch(url, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        if (response.ok) {
+            Swal.fire({
+                title: 'Success!',
+                text: oldCategory + ' is deleted!',
+                icon: 'success',
+                confirmButtonColor: '#0275d8'
+
+            });
+            Alpine.store('cat', getCategories());
+            Alpine.store('recipes', getRecipes());
+        }
+        else {
+            Swal.fire({
+                title: 'No changes are applied!',
+                icon: 'info',
+                confirmButtonColor: '#0275d8'
+            })
+        }
+    }
+
+    // Adding a category.
+    async function addCategory(category) {
+        if (category.trim().length === 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'No category name was inputed...',
+                text: `please fill out the text box`,
+                confirmButtonColor: '#0275d8'
+            })
+        }
+        else
+        {
+            let response = await fetch('https://localhost:7187/recipes/add-category/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    Name: category
+                })
+            })
+            if (response.ok) {
+                Swal.fire({
+                    title: 'Success!',
+                    text: category + ' is successfuly added!',
+                    icon: 'success',
+                    confirmButtonColor: '#0275d8'
+
+                });
+                Alpine.store('cat', getCategories());
+            }
+            else {
+                Swal.fire({
+                    title: 'Could not add category!',
+                    icon: 'info',
+                    confirmButtonColor: '#0275d8'
+                })
+            }
+        }
+    }
+
+    // Renaming a category.
+    async function renameCategory(name, newName) {
+        if (newName.trim().length === 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'No new category name was inputed...',
+                text: `please fill out the text box`,
+                confirmButtonColor: '#0275d8'
+            })
+        }
+        else
+        {
+            let url = 'https://localhost:7187/categories/rename-category?oldName=' + name + '&newName=' + newName;
+            let response = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            if (response.ok) {
+                Swal.fire({
+                    title: 'Success!',
+                    text: name + ' is renamed to ' + newName + '!',
+                    icon: 'success',
+                    confirmButtonColor: '#0275d8'
+                });
+                Alpine.store('cat', getCategories());
+                Alpine.store('recipes', getRecipes());
+            }
+            else {
+                Swal.fire({
+                    title: 'No changes are applied!',
+                    icon: 'info',
+                    confirmButtonColor: '#0275d8'
+                });
+            }
+        }
+    }
+</script>
 
 

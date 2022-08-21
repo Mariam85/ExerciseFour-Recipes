@@ -130,13 +130,11 @@ app.MapDelete("recipes/remove-category/{category}", async (string category) =>
 {
     // Removing from the categories file.
     List<Categories> categories =await ReadCategories();
-    bool isRemoved=categories.Remove(categories.Find(c => c.Name == category));
-    if(!isRemoved)
-    {
-       return Results.BadRequest("This category does not exist.");
-    }
-    else 
+
+    var itemToRemove = categories.SingleOrDefault(c => c.Name == category);
+    if (itemToRemove != null)
     { 
+    categories.Remove(itemToRemove);
        UpdateCategories(categories);
        // Removing from the recipes file.
        List<Recipe> recipes = await ReadFile();
@@ -163,20 +161,39 @@ app.MapDelete("recipes/remove-category/{category}", async (string category) =>
        }
        return Results.Ok("Successfuly deleted.");
     }
+    else
+    {
+       return Results.BadRequest("This category does not exist.");
+    }
+    
 });
 
 // Getting the json file content to display it.
 app.MapGet("recipes", async () =>
 {
     List<Recipe> recipes = await ReadFile();
-    return Results.Ok(recipes);
+    if(recipes!= null)
+    {
+      return Results.Ok(recipes);
+    }
+    else
+    {
+        return Results.BadRequest("No recipes found");
+    }
 });
 
 // Getting the json file content of the categories.
 app.MapGet("categories", async () =>
 {
     List<Categories> recipes =await ReadCategories();
-    return Results.Ok(recipes);
+    if(recipes!= null)
+    {
+      return Results.Ok(recipes);
+    }
+    else
+    {
+        return Results.BadRequest("No categories found");
+    }
 });
 app.UseCors(MyAllowSpecificOrigins);
 app.Run();
