@@ -63,7 +63,7 @@
                                         </div>
                                         <form style="text-align:left;overflow-x: hidden;overflow-y: auto;"
                                               x-data="{recipe: {id: recipe.id, title: recipe.title, instructions: '• '+recipe.instructions.join('\n• '), ingredients: '• '+recipe.ingredients.join('\n• '), categories: recipe.categories}}"
-                                              x-on:submit.prevent="await editRecipe(recipe);$store.recipes = await getRecipes();">
+                                              x-on:submit.prevent="await editRecipe(recipe)" ;>
                                             <div class="modal-body">
                                                 <div class="mb-3 ">
                                                     <label for="title" class="col-2 col-form-label fw-bold " style="width : 100%; ">Title</label>
@@ -144,7 +144,7 @@
                                 <div class="modal-dialog modal-dialog-scrollable modal-lg">
                                     <div class="modal-content">
                                         <form style="text-align:left;overflow-x: hidden;overflow-y: auto;"
-                                              x-on:submit.prevent="await addRecipe(recipe); $el.reset();"
+                                              x-on:submit.prevent="await addRecipe(recipe);$el.reset();recipe={title: '', ingredients: '', instructions: '', categories:[]};"
                                               x-data="{recipe: {title: '', ingredients: '', instructions: '', categories:[]}, availablecategories: ''}"
                                               x-effect="availablecategories = await $store.cat">
                                             <div class="modal-header">
@@ -430,6 +430,8 @@
     // Editing recipes.
     async function editRecipe(recipe) {
 
+        let resetRecipe = false;
+
         // Checking that all the textboxes are filled.
         if (recipe.title.trim().length === 0 || recipe.ingredients.trim().length === 0 || recipe.instructions.trim().length === 0 || recipe.categories.length === 0) {
             Swal.fire({
@@ -438,8 +440,10 @@
                 text: `please fill out the text boxes`,
                 confirmButtonColor: '#0275d8'
             })
+            resetRecipe = true;
         }
-        else {
+        else
+        {
             let ingredients = recipe.ingredients.replaceAll('\n', '').split('• ');
             ingredients.shift();
             let instructions = recipe.instructions.replaceAll('\n', '').split('• ');
@@ -458,17 +462,18 @@
                     categories: recipe.categories
                 })
             });
-            if (response.ok) {
+            if (response.ok)
+            {
                 Swal.fire({
                     title: 'Success!',
                     text: 'recipe is successfuly edited!',
                     icon: 'success',
                     confirmButtonColor: '#0275d8'
-
                 })
-                Alpine.store('recipes', getRecipes());
             }
-            else {
+            else
+            {
+                resetRecipe = true;
                 Swal.fire({
                     title: 'No changes are applied!',
                     icon: 'info',
@@ -476,6 +481,25 @@
                 });
             }
         }
+        if (resetRecipe)
+        {
+            let url = link + 'recipes/list-recipe/' + recipe.id;
+            let oldRecipe = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            });
+            oldRecipe.text().then(function (text) {
+                recipeDetails = JSON.parse(text);
+                recipe.id = recipeDetails.id;
+                recipe.ingredients = '• ' + recipeDetails.ingredients.join('\n• ');
+                recipe.title = recipeDetails.title;
+                recipe.instructions = '• ' + recipeDetails.instructions.join('\n• ');
+                recipe.categories = recipeDetails.categories;
+            });
+        }
+        Alpine.store('recipes', getRecipes());
     }
 
     // Listing recipes.

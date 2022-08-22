@@ -51,14 +51,14 @@ app.MapPut("recipes/edit-recipe/{id}", async (Guid id, Recipe editedRecipe) =>
 });
 
 // Listing a recipe.
-app.MapGet("recipes/list-recipe/{title}", async (string title) =>
+app.MapGet("recipes/list-recipe/{id}", async (Guid id) =>
 {
     List<Recipe> recipes = await ReadFile();
-    List<Recipe> foundRecipes = recipes.FindAll(r => r.Title == title);
-    if (!foundRecipes.Any())
+    Recipe foundRecipe = recipes.Find(r => r.Id == id);
+    if (foundRecipe==null)
         return Results.NotFound();
     else
-        return Results.Ok(foundRecipes);
+        return Results.Ok(foundRecipe);
 });
 
 // Deleting a recipe.
