@@ -19,8 +19,7 @@
     @* Recipes*@
     <div x-show="tab == 'recipes'">
         <div x-effect="recipes = await $store.recipes;"
-             x-data="{ recipes: [] }"
-             >
+             x-data="{ recipes: [] }">
             <header role="banner">
                 <h1 style="font-family: Lucida Sans Unicode;">Find and share recipes</h1>
             </header>
@@ -71,7 +70,7 @@
                                                 <div class="my-3 row">
                                                     <label for="editRecipeIngredients" class="col-2 col-form-label fw-bold " style="width : 100%; ">Ingredients</label>
                                                     <div class="col-7" style="width : 100%; ">
-                                                        <textarea class=" form-control h-100" x-model="recipe.ingredients" id="editRecipeIngredients" rows="6" ></textarea>
+                                                        <textarea class=" form-control h-100" x-model="recipe.ingredients" id="editRecipeIngredients" rows="6"></textarea>
                                                     </div>
                                                 </div>
                                                 <div class="my-3 row">
@@ -234,8 +233,7 @@
     @* Categories *@
     <div x-show="tab=='categories'">
         <div x-effect="cat = await $store.cat;"
-             x-data="{ cat: [] }"
-             >
+             x-data="{ cat: [] }">
             <header role="banner">
                 <h1 style="font-family: Lucida Sans Unicode;">Find and share categories</h1>
             </header>
@@ -260,7 +258,7 @@
                                     <input style="background-color: rgba(0, 0, 0, 0);" class="border-0 " id="oldVal" name="oldVal" x-model="category.name" />
                                 </td>
                                 <td>
-                                    <button type="button" class="btn  btn btn-primary add" id="btn" data-bs-toggle="modal" :data-bs-target="'#editCategoryModal' + category.name">
+                                    <button type="button" class="btn  btn btn-primary add" id="btn" data-bs-toggle="modal" :data-bs-target="'#editCategoryModal' + category.id">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
                                             <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z" />
                                         </svg>
@@ -268,7 +266,7 @@
                                 </td>
                                 <td>
                                     <form>
-                                        <button type="button" class="btn  btn btn-danger delete_row" data-bs-toggle="modal" :data-bs-target="'#removeCategoryModal' + category.name">
+                                        <button type="button" class="btn  btn btn-danger delete_row" data-bs-toggle="modal" :data-bs-target="'#removeCategoryModal' + category.id">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
                                                 <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
                                                 <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
@@ -276,7 +274,7 @@
                                         </button>
                                     </form>
 
-                                    <div class="modal fade" :id="'editCategoryModal' + category.name;" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+                                    <div class="modal fade" :id="'editCategoryModal' + category.id;" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
                                         <div class="modal-dialog">
                                             <div class="modal-content">
                                                 <div class="modal-header">
@@ -305,15 +303,14 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="modal fade" :id="'removeCategoryModal' + category.name;" tabindex="-1" aria-labelledby="removeCategoryModalLabel" aria-hidden="true">
+                                    <div class="modal fade" :id="'removeCategoryModal' + category.id;" tabindex="-1" aria-labelledby="removeCategoryModalLabel" aria-hidden="true">
                                         <div class="modal-dialog">
                                             <div class="modal-content">
                                                 <div class="modal-header">
                                                     <h5 class="modal-title" style="color:#00008B;">Remove category</h5>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
-                                                <form style="text-align:center;" x-on:submit.prevent="await removeCategory(category.name);cat = await getCategories();"
-                                                      >
+                                                <form style="text-align:center;" x-on:submit.prevent="await removeCategory(category.name);cat = await getCategories();">
                                                     <div class="modal-body">
                                                         <div>
                                                             <label class="col-form-label fw-bold ">Are you sure you want to delete this category?</label>
@@ -378,8 +375,7 @@
     // Adding a recipe.
     async function addRecipe(recipe) {
         // Checking that all the textboxes are filled.
-        if (recipe.title.trim().length === 0 || recipe.ingredients.trim().length === 0 || recipe.instructions.trim().length === 0 || recipe.categories.length === 0)
-        {
+        if (recipe.title.trim().length === 0 || recipe.ingredients.trim().length === 0 || recipe.instructions.trim().length === 0 || recipe.categories.length === 0) {
             Swal.fire({
                 icon: 'error',
                 title: 'Not all of the parameters are filled...',
@@ -387,8 +383,7 @@
                 confirmButtonColor: '#0275d8'
             })
         }
-        else
-        {
+        else {
             let ingredients = recipe.ingredients.replaceAll('\n', '').split('• ');
             ingredients.shift();
             let instructions = recipe.instructions.replaceAll('\n', '').split('• ');
@@ -431,8 +426,7 @@
     async function editRecipe(recipe) {
 
         // Checking that all the textboxes are filled.
-        if (recipe.title.trim().length === 0 || recipe.ingredients.trim().length === 0 || recipe.instructions.trim().length === 0 || recipe.categories.length === 0)
-        {
+        if (recipe.title.trim().length === 0 || recipe.ingredients.trim().length === 0 || recipe.instructions.trim().length === 0 || recipe.categories.length === 0) {
             Swal.fire({
                 icon: 'error',
                 title: 'Not all of the parameters are filled...',
@@ -440,8 +434,7 @@
                 confirmButtonColor: '#0275d8'
             })
         }
-        else
-        {
+        else {
             let ingredients = recipe.ingredients.replaceAll('\n', '').split('• ');
             ingredients.shift();
             let instructions = recipe.instructions.replaceAll('\n', '').split('• ');
@@ -565,7 +558,8 @@
 
     // Adding a category.
     async function addCategory(category) {
-        if (category.trim().length === 0) {
+        if (category.trim().length === 0)
+        {
             Swal.fire({
                 icon: 'error',
                 title: 'No category name was inputed...',
@@ -584,29 +578,44 @@
                     Name: category
                 })
             })
-            if (response.ok) {
-                Swal.fire({
-                    title: 'Success!',
-                    text: category + ' is successfuly added!',
-                    icon: 'success',
-                    confirmButtonColor: '#0275d8'
+            response.text().then(function (text)
+            {
+                if (text.includes("This category already exists"))
+                {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'A category of this name exists...',
+                        text: `please enter a non-existing name`,
+                        confirmButtonColor: '#0275d8'
+                    });
+                }
+                else if (response.ok)
+                {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: category + ' is successfuly added!',
+                        icon: 'success',
+                        confirmButtonColor: '#0275d8'
 
-                });
-                Alpine.store('cat', getCategories());
-            }
-            else {
-                Swal.fire({
-                    title: 'Could not add category!',
-                    icon: 'info',
-                    confirmButtonColor: '#0275d8'
-                })
-            }
+                    });
+                    Alpine.store('cat', getCategories());
+                }
+                else
+                {
+                    Swal.fire({
+                        title: 'Could not add category!',
+                        icon: 'info',
+                        confirmButtonColor: '#0275d8'
+                    });
+                }
+            });
         }
     }
 
     // Renaming a category.
     async function renameCategory(name, newName) {
-        if (newName.trim().length === 0) {
+        if (newName.trim().length === 0)
+        {
             Swal.fire({
                 icon: 'error',
                 title: 'No new category name was inputed...',
@@ -623,23 +632,37 @@
                     'Content-Type': 'application/json'
                 }
             });
-            if (response.ok) {
-                Swal.fire({
-                    title: 'Success!',
-                    text: name + ' is renamed to ' + newName + '!',
-                    icon: 'success',
-                    confirmButtonColor: '#0275d8'
-                });
-                Alpine.store('cat', getCategories());
-                Alpine.store('recipes', getRecipes());
-            }
-            else {
-                Swal.fire({
-                    title: 'No changes are applied!',
-                    icon: 'info',
-                    confirmButtonColor: '#0275d8'
-                });
-            }
+            response.text().then(function (text)
+            {
+                if (text.includes("new category name already exists"))
+                {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'A category of this name exists...',
+                        text: `please enter a non-existing name`,
+                        confirmButtonColor: '#0275d8'
+                    });
+                }
+                else if (response.ok)
+                {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: name + ' is renamed to ' + newName + '!',
+                        icon: 'success',
+                        confirmButtonColor: '#0275d8'
+                    });
+                    Alpine.store('cat', getCategories());
+                    Alpine.store('recipes', getRecipes());
+                }
+                else
+                {
+                    Swal.fire({
+                        title: 'No changes are applied!',
+                        icon: 'info',
+                        confirmButtonColor: '#0275d8'
+                    });
+                }
+            });
         }
     }
 </script>

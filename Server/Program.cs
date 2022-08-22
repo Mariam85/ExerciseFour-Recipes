@@ -84,11 +84,21 @@ app.MapPost("recipes/add-category", async (Categories category) =>
     List<Categories> categories =await ReadCategories();
     if (categories.Any())
     {
-        categories.Add(category);
-        UpdateCategories(categories);
-        return Results.Created("Successfully added a category",category);
+        if(categories.FindIndex(c=>c.Name==category.Name) ==-1)
+        { 
+            categories.Add(category);
+            UpdateCategories(categories);
+            return Results.Created("Successfully added a category",category);
+        }
+        else
+        {
+            return Results.BadRequest("This category already exists"); 
+        }
     }
-    return Results.BadRequest();
+    else
+    {
+        return Results.BadRequest();
+    }
 });
 
 // Renaming a category.
@@ -99,29 +109,36 @@ app.MapPut("categories/rename-category", async (string oldName, string newName) 
     int index = categories.FindIndex(c => c.Name == oldName);
     if (index != -1)
     {
-        categories[index].Name = newName;
-        UpdateCategories(categories);
-
-        // Renaming category in the recipes file.
-        List<Recipe> recipes = await ReadFile();
-        List<Recipe> beforeRename = recipes.FindAll(r => r.Categories.Contains(oldName));
-        if (beforeRename.Count!=0)
+        if(categories.FindIndex(c=>c.Name==newName) ==-1)
         {
-            foreach (Recipe r in beforeRename)
+            categories[index].Name = newName;
+            UpdateCategories(categories);
+            
+            // Renaming category in the recipes file.
+            List<Recipe> recipes = await ReadFile();
+            List<Recipe> beforeRename = recipes.FindAll(r => r.Categories.Contains(oldName));
+            if (beforeRename.Count!=0)
             {
-                int i = r.Categories.FindIndex(cat => cat == oldName);
-                if (i != -1)
+                foreach (Recipe r in beforeRename)
                 {
-                    r.Categories[i] = newName;
+                    int i = r.Categories.FindIndex(cat => cat == oldName);
+                    if (i != -1)
+                    {
+                        r.Categories[i] = newName;
+                    }
                 }
+                UpdateFile(recipes);
             }
-        UpdateFile(recipes);
+            return Results.Ok("Successfully updated");
         }
-        return Results.Ok("Successfully updated");
+        else
+        {
+            return Results.BadRequest("new category name already exists"); 
+        }
     }
     else
     {
-        return Results.BadRequest("This category does not exist.");
+        return Results.BadRequest("old category does not exist.");
     }
 });
 
