@@ -9,7 +9,7 @@ IConfiguration config = new ConfigurationBuilder()
 builder.Services.AddRazorPages();
 builder.Services.AddHttpClient("Recipes", httpClient =>
 {
-    httpClient.BaseAddress = new Uri(config["url"]);
+    httpClient.BaseAddress = new Uri(config["Url"]);
     httpClient.DefaultRequestHeaders.Add(
         HeaderNames.Accept, "application/json");
     httpClient.DefaultRequestHeaders.Add(

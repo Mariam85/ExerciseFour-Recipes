@@ -1,14 +1,1 @@
-[
-  {
-    "Id": "4de82252-6a2b-4b92-9d29-42e643e5c36b",
-    "Name": "Supper"
-  },
-  {
-    "Id": "b929d70c-2a02-4bec-9b97-25df907bc503",
-    "Name": "Brunch"
-  },
-  {
-    "Id": "08a84cd8-2e2e-42d5-931f-8ea204440357",
-    "Name": "Dinner"
-  }
-]
+[{"Id":"4de82252-6a2b-4b92-9d29-42e643e5c36b","Name":"Apppp"},{"Id":"b929d70c-2a02-4bec-9b97-25df907bc503","Name":"Brunch"},{"Id":"08a84cd8-2e2e-42d5-931f-8ea204440357","Name":"Dinner"}]
