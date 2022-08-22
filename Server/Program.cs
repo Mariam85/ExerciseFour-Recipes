@@ -104,6 +104,11 @@ app.MapPost("recipes/add-category", async (Categories category) =>
 // Renaming a category.
 app.MapPut("categories/rename-category", async (string oldName, string newName) =>
 {
+    if(oldName==newName)
+    {
+        return Results.BadRequest("you have entered the same name"); 
+    }
+
     // Renaming category in the categories file.
     List<Categories> categories =await ReadCategories();
     int index = categories.FindIndex(c => c.Name == oldName);

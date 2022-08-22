@@ -638,6 +638,15 @@
                         confirmButtonColor: '#0275d8'
                     });
                 }
+                else if (text.includes("you have entered the same name"))
+                {
+                    Swal.fire({
+                        title: 'No changes are applied!',
+                        text: 'please enter a new name',
+                        icon: 'info',
+                        confirmButtonColor: '#0275d8'
+                    });
+                }
                 else if (response.ok) {
                     Swal.fire({
                         title: 'Success!',
