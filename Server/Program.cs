@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
+using Microsoft.AspNetCore.Antiforgery;
 
 var builder = WebApplication.CreateBuilder(args);
 IConfiguration config = new ConfigurationBuilder()
@@ -19,19 +20,30 @@ builder.Services.AddCors(options =>
                                                 .AllowAnyOrigin();
                       });
 });
+builder.Services.AddAntiforgery();
+
 var app = builder.Build();
 
 // Adding a recipe.
-app.MapPost("recipes/add-recipe", async (Recipe recipe) =>
+app.MapPost("recipes/add-recipe", async (HttpContext context, IAntiforgery antiforgery,Recipe recipe) =>
 {
-    List<Recipe> recipes = await ReadFile();
-    if (recipes.Any())
+    try
     {
-        recipes.Add(recipe);
-        UpdateFile(recipes);
-        return Results.Created("Successfully added a recipe", recipe);
+        await antiforgery.ValidateRequestAsync(context);
+        List<Recipe> recipes = await ReadFile();
+        if (recipes.Any())
+        {
+            recipes.Add(recipe);
+            UpdateFile(recipes);
+            return Results.Created("Successfully added a recipe", recipe);
+        }
+        return Results.BadRequest();
     }
-    return Results.BadRequest();
+    catch (Exception ex)
+    {
+        Console.WriteLine(ex);
+        return Results.Problem(ex?.Message ?? string.Empty);
+    }
 });
 
 // Editing a recipe.

@@ -2,8 +2,10 @@
 @model IndexModel
 @using Microsoft.Extensions.Configuration
 @inject IConfiguration Configuration
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
 @{
     ViewData["Title"] = "Simple Recipes";
+    var requestToken = Antiforgery.GetAndStoreTokens(HttpContext).RequestToken;
 }
 
 <head>
@@ -35,7 +37,7 @@
                     <div>
                         <div class="hover-zoom carousel-inner">
                             <div class="item active">
-                                <button style="border-radius: 12px;height: 400px;" class="border-0 mt-3 zoom  cards  card-body border-1" data-bs-toggle="modal" :data-bs-target="'#detailsModal' + recipe.id">
+                                <button onclick="$store.recipes = await getRecipes();$store.cat=await getCategories()" style="border-radius: 12px;height: 400px;" class="border-0 mt-3 zoom  cards  card-body border-1" data-bs-toggle="modal" :data-bs-target="'#detailsModal' + recipe.id">
                                     <h4 x-text="recipe.title" class="cta card-title" style="color:black"></h4>
                                     <template x-for="category in recipe.categories">
                                         <span style="text-align:left; background-color:#00008B" class="badge mb-2 mx-1" x-text="category"></span>
@@ -62,8 +64,8 @@
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <form style="text-align:left;overflow-x: hidden;overflow-y: auto;"
-                                              x-data="{recipe: {id: recipe.id, title: recipe.title, instructions: '• '+recipe.instructions.join('\n• '), ingredients: '• '+recipe.ingredients.join('\n• '), categories: recipe.categories}}"
-                                              x-on:submit.prevent="await editRecipe(recipe)" ;>
+                                              x-on:submit.prevent="await editRecipe(recipe);$store.recipes = await getRecipes();"
+                                              x-data="{recipe: {id: recipe.id, title: recipe.title, instructions: '• '+recipe.instructions.join('\n• '), ingredients: '• '+recipe.ingredients.join('\n• '), categories: recipe.categories}}">
                                             <div class="modal-body">
                                                 <div class="mb-3 ">
                                                     <label for="title" class="col-2 col-form-label fw-bold " style="width : 100%; ">Title</label>
@@ -143,14 +145,15 @@
                             <div class="modal fade" id="createRecipeModal" tabindex="-1" aria-labelledby="createRecipeModalLabel" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-scrollable modal-lg">
                                     <div class="modal-content">
-                                        <form style="text-align:left;overflow-x: hidden;overflow-y: auto;"
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="createRecipeModalLabel" style="color:#00008B;">Add recipe</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <form method="post" style="text-align:left;overflow-x: hidden;overflow-y: auto;"
                                               x-on:submit.prevent="await addRecipe(recipe);$el.reset();recipe={title: '', ingredients: '', instructions: '', categories:[]};"
                                               x-data="{recipe: {title: '', ingredients: '', instructions: '', categories:[]}, availablecategories: ''}"
                                               x-effect="availablecategories = await $store.cat">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="createRecipeModalLabel" style="color:#00008B;">Add recipe</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                            </div>
+                                            <input name="{requestToken.FormFieldName}" hidden value="{requestToken.RequestToken}" />
                                             <div class="modal-body">
                                                 <div class="mb-3">
                                                     <label style="width : 100%; " class="col-form-label col-2 fw-bold " for="createRecipeTitle">Title</label>
@@ -283,7 +286,7 @@
                                                     <h5 class="modal-title" style="color:#00008B;">Rename category</h5>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
-                                                <form x-on:submit.prevent="await renameCategory(oldCategory, editedCategory);cat = await getCategories();$el.reset(); editedCategory = '';"
+                                                <form x-on:submit.prevent="await renameCategory(oldCategory, editedCategory);$store.cat = await getCategories();$el.reset(); editedCategory = '';$store.recipes = await getRecipes();"
                                                       x-data="{oldCategory: '', editedCategory: ''}"
                                                       x-effect="oldCategory=category.name;">
                                                     <div class="modal-body">
@@ -393,11 +396,11 @@
             let instructions = recipe.instructions.replaceAll('\n', '').split('• ');
             instructions.shift();
 
-
             let response = await fetch(link+'recipes/add-recipe/', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'antiForgery': '@requestToken',
                 },
                 body: JSON.stringify({
                     id: recipe.id,
@@ -407,6 +410,9 @@
                     categories: recipe.categories
                 })
             })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
             if (response.ok) {
                 Swal.fire({
                     title: 'Success!',
@@ -429,9 +435,7 @@
 
     // Editing recipes.
     async function editRecipe(recipe) {
-
         let resetRecipe = false;
-
         // Checking that all the textboxes are filled.
         if (recipe.title.trim().length === 0 || recipe.ingredients.trim().length === 0 || recipe.instructions.trim().length === 0 || recipe.categories.length === 0) {
             Swal.fire({
