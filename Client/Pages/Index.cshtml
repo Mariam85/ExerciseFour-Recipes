@@ -2,10 +2,8 @@
 @model IndexModel
 @using Microsoft.Extensions.Configuration
 @inject IConfiguration Configuration
-@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
 @{
     ViewData["Title"] = "Simple Recipes";
-    var requestToken = Antiforgery.GetAndStoreTokens(HttpContext).RequestToken;
 }
 
 <head>
@@ -19,25 +17,32 @@
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
-<body style="background: url('https://images.unsplash.com/photo-1614548539644-ef528186523a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80')no-repeat; background-size: cover ">
+<body style="background: url('https://images.unsplash.com/photo-1614548539644-ef528186523a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80')no-repeat; background-size: cover;">
     @* Recipes*@
     <div x-show="tab == 'recipes'">
         <div x-effect="recipes = await $store.recipes;"
              x-data="{ recipes: [] }">
             <header role="banner">
-                <h1 style="font-family: Lucida Sans Unicode;">Find and share recipes</h1>
+                <h1 style="top: 60px; font-family: Lucida Sans Unicode;">Find and share recipes</h1>
+                <div class="input-group-text" style="border: none; background: transparent; width: 450px; padding: 15px; position: absolute; top: 60px; right: 50px; ">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
+                    </svg>
+                    <input type="text" style="font-family: Arial; box-shadow: #ff0000; outline: none; background: transparent; border-top-style: hidden; border-right-style: hidden; border-left-style: hidden; border-bottom-style: groove; " id="myFilter" class="form-control" onkeyup="myFunction()" placeholder="Search for a recipe...">
+                </div>
             </header>
             <button class="button--nina" style="border-radius: 12px;font-family: Arial;" data-bs-toggle="modal" data-bs-target="#createRecipeModal">
                 <svg class="bi bi-type-bold" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                     <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
                 </svg>Add
             </button>
-            <div id="carousel" class="hover-zoom text-center  carousel slide" data-bs-ride="carousel">
-                <template x-for="recipe in recipes">
-                    <div>
+            <div id="carousel" class="hover-zoom text-center carousel slide
+                 " data-bs-ride="carousel" style="height: 450px;">
+                <div class="container" id="myProducts">
+                    <template x-for="recipe in recipes">
                         <div class="hover-zoom carousel-inner">
                             <div class="item active">
-                                <button onclick="$store.recipes = await getRecipes();$store.cat=await getCategories()" style="border-radius: 12px;height: 400px;" class="border-0 mt-3 zoom  cards  card-body border-1" data-bs-toggle="modal" :data-bs-target="'#detailsModal' + recipe.id">
+                                <button style="border-radius: 12px;height: 400px;" class="border-0 mt-3 zoom  cards  card-body border-1" data-bs-toggle="modal" :data-bs-target="'#detailsModal' + recipe.id">
                                     <h4 x-text="recipe.title" class="cta card-title" style="color:black"></h4>
                                     <template x-for="category in recipe.categories">
                                         <span style="text-align:left; background-color:#00008B" class="badge mb-2 mx-1" x-text="category"></span>
@@ -63,10 +68,10 @@
                                             <h5 class="modal-title" style="color:#00008B;">Edit recipe</h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
-                                        <form style="text-align:left;overflow-x: hidden;overflow-y: auto;"
-                                              x-on:submit.prevent="await editRecipe(recipe);$store.recipes = await getRecipes();"
-                                              x-data="{recipe: {id: recipe.id, title: recipe.title, instructions: '• '+recipe.instructions.join('\n• '), ingredients: '• '+recipe.ingredients.join('\n• '), categories: recipe.categories}}">
-                                            <div class="modal-body">
+                                        <form x-on:submit.prevent="await editRecipe(recipe);$store.recipes = await getRecipes();"
+                                              x-data="{recipe: {id: recipe.id, title: recipe.title, instructions: '• '+recipe.instructions.join('\n• '), ingredients: '• '+recipe.ingredients.join('\n• '), categories: recipe.categories}, availablecategories: []}"
+                                              x-effect="availablecategories = await $store.cat;recipes=await $store.recipes;">
+                                            <div class="modal-body" style="max-height:535.5px; overflow-y:scroll;overflow-x:hidden;text-align:left;">
                                                 <div class="mb-3 ">
                                                     <label for="title" class="col-2 col-form-label fw-bold " style="width : 100%; ">Title</label>
                                                     <input id="title" class="border-0" x-model="recipe.title">
@@ -86,7 +91,7 @@
                                                 <div class="my-3 row">
                                                     <label for="editRecipeCategories" class="col-2 col-form-label fw-bold " style="width : 100%; ">Categories</label>
                                                     <div class="col-7">
-                                                        <template x-for="category in await $store.cat ">
+                                                        <template x-for="category in availablecategories ">
                                                             <div>
                                                                 <input :id="'category'+ category.name + recipe.id" type="checkbox" :value="category.name" x-model="recipe.categories">
                                                                 <label :for="'category'+ category.name + recipe.id" x-text="category.name"></label>
@@ -149,19 +154,17 @@
                                             <h5 class="modal-title" id="createRecipeModalLabel" style="color:#00008B;">Add recipe</h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
-                                        <form method="post" style="text-align:left;overflow-x: hidden;overflow-y: auto;"
+                                        <form method="post"
                                               x-on:submit.prevent="await addRecipe(recipe);$el.reset();recipe={title: '', ingredients: '', instructions: '', categories:[]};"
                                               x-data="{recipe: {title: '', ingredients: '', instructions: '', categories:[]}, availablecategories: ''}"
                                               x-effect="availablecategories = await $store.cat">
-                                            <input name="{requestToken.FormFieldName}" hidden value="{requestToken.RequestToken}" />
-                                            <div class="modal-body">
+                                            <div class="modal-body" style="max-height: 535.5px; overflow-x: hidden;overflow-y: scroll; text-align: left;">
                                                 <div class="mb-3">
                                                     <label style="width : 100%; " class="col-form-label col-2 fw-bold " for="createRecipeTitle">Title</label>
                                                     <div class="col-7">
                                                         <input id="createRecipeTitle" x-model="recipe.title" class=" form-control h-100" placeholder="Enter the title..." />
                                                     </div>
                                                 </div>
-
                                                 <div class="my-3 row">
                                                     <label style="width : 100%; " class="col-form-label col-2 fw-bold " for="createRecipeIngredients">Ingredients</label>
                                                     <div class="col-7">
@@ -230,8 +233,8 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </template>
+                    </template>
+                </div>
             </div>
         </div>
     </div>
@@ -247,7 +250,7 @@
                     <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
                 </svg>Add
             </button>
-            <div style="margin-left: auto; margin-right: auto; width: 700px; height: 500px;">
+            <div style="margin-left: auto; margin-right: auto; width: 700px; height: 500px; overflow-y: auto;">
                 <table style="margin-left: auto; margin-right: auto;" id="add_table" class="table-striped bg-light table" data-toggle="table" data-mobile-responsive="true">
                     <thead class="table-info">
                         <tr>
@@ -286,11 +289,10 @@
                                                     <h5 class="modal-title" style="color:#00008B;">Rename category</h5>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
-                                                <form x-on:submit.prevent="await renameCategory(oldCategory, editedCategory);$store.cat = await getCategories();$el.reset(); editedCategory = '';$store.recipes = await getRecipes();"
+                                                <form x-on:submit.prevent="await renameCategory(oldCategory, editedCategory);$store.cat = await getCategories();$store.recipes = await getRecipes();$el.reset(); editedCategory = '';"
                                                       x-data="{oldCategory: '', editedCategory: ''}"
                                                       x-effect="oldCategory=category.name;">
                                                     <div class="modal-body">
-
                                                         <div>
                                                             <label for="editCategoryTitle" class="col-form-label fw-bold ">Enter the new name</label>&nbsp
                                                             <div class="col-10">
@@ -298,7 +300,6 @@
                                                             </div>
                                                         </div>
                                                     </div>
-
                                                     <div class="modal-footer">
                                                         <button type="submit" data-bs-dismiss="modal" class="btn btn-primary">
                                                             Edit
@@ -379,6 +380,23 @@
         Alpine.store('cat', getCategories());
     });
 
+    // Search for a recipe.
+    function myFunction() {
+        var input, filter, cards, cardContainer, title, i;
+        input = document.getElementById("myFilter");
+        filter = input.value.toUpperCase();
+        cardContainer = document.getElementById("myProducts");
+        cards = cardContainer.getElementsByClassName("item");
+        for (i = 0; i < cards.length; i++) {
+            title = cards[i].querySelector(".card-title");
+            if (title.innerText.toUpperCase().indexOf(filter) > -1) {
+                cards[i].style.display = "";
+            } else {
+                cards[i].style.display = "none";
+            }
+        }
+    }
+
     // Adding a recipe.
     async function addRecipe(recipe) {
         // Checking that all the textboxes are filled.
@@ -399,8 +417,7 @@
             let response = await fetch(link+'recipes/add-recipe/', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'antiForgery': '@requestToken',
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     id: recipe.id,
@@ -425,7 +442,7 @@
             }
             else {
                 Swal.fire({
-                    title: 'Could not add category!',
+                    title: 'Could not add recipe!',
                     icon: 'info',
                     confirmButtonColor: '#0275d8'
                 })
@@ -436,8 +453,20 @@
     // Editing recipes.
     async function editRecipe(recipe) {
         let resetRecipe = false;
+        let found = false;
+        let c = await getCategories();
+
+        for (let i = 0; i < c.length; i++) {
+            const index = recipe.categories.indexOf(c[i].name);
+            if (index != -1)
+            {
+                found = true;
+                break;
+            }
+        }
+
         // Checking that all the textboxes are filled.
-        if (recipe.title.trim().length === 0 || recipe.ingredients.trim().length === 0 || recipe.instructions.trim().length === 0 || recipe.categories.length === 0) {
+        if (recipe.title.trim().length === 0 || recipe.ingredients.trim().length === 0 || recipe.instructions.trim().length === 0 || recipe.categories.length === 0 || !found) {
             Swal.fire({
                 icon: 'error',
                 title: 'Not all of the parameters are filled...',
@@ -683,7 +712,7 @@
                         confirmButtonColor: '#0275d8'
                     });
                     Alpine.store('cat', getCategories());
-                    Alpine.store('recipes', getRecipes());
+                    Alpine.store('recipes',getRecipes());
                 }
                 else {
                     Swal.fire({
@@ -696,5 +725,3 @@
         }
     }
 </script>
-
-
