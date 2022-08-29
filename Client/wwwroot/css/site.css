@@ -273,3 +273,7 @@ body {
     min-height: 20vh;
     margin: 15px;
 }
+#myFilter.form-control:focus {
+    box-shadow:none;
+}
+
