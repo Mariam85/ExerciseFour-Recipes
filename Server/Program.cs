@@ -3,6 +3,9 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Antiforgery;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 IConfiguration config = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
     .AddEnvironmentVariables()
@@ -20,30 +23,29 @@ builder.Services.AddCors(options =>
                                                 .AllowAnyOrigin();
                       });
 });
-builder.Services.AddAntiforgery();
 
 var app = builder.Build();
+
+app.UseSwagger();
+app.UseSwaggerUI();
+
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+    options.RoutePrefix = string.Empty;
+});
 
 // Adding a recipe.
 app.MapPost("recipes/add-recipe", async (HttpContext context, IAntiforgery antiforgery,Recipe recipe) =>
 {
-    try
+    List<Recipe> recipes = await ReadFile();
+    if (recipes.Any())
     {
-        await antiforgery.ValidateRequestAsync(context);
-        List<Recipe> recipes = await ReadFile();
-        if (recipes.Any())
-        {
-            recipes.Add(recipe);
-            UpdateFile(recipes);
-            return Results.Created("Successfully added a recipe", recipe);
-        }
-        return Results.BadRequest();
+        recipes.Add(recipe);
+        UpdateFile(recipes);
+        return Results.Created("Successfully added a recipe", recipe);
     }
-    catch (Exception ex)
-    {
-        Console.WriteLine(ex);
-        return Results.Problem(ex?.Message ?? string.Empty);
-    }
+    return Results.BadRequest();
 });
 
 // Editing a recipe.
@@ -219,7 +221,7 @@ app.Run();
 static async Task<List<Recipe>> ReadFile()
 {
     string sCurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
-    string sFile = System.IO.Path.Combine(sCurrentDirectory, @"..\..\..\" + "Text.json");
+    string sFile = System.IO.Path.Combine(Environment.CurrentDirectory,"Text.json");
     string sFilePath = Path.GetFullPath(sFile);
     string jsonString = await File.ReadAllTextAsync(sFilePath);
     List<Recipe>? menu = System.Text.Json.JsonSerializer.Deserialize<List<Recipe>>(jsonString);
@@ -230,7 +232,7 @@ static async Task<List<Recipe>> ReadFile()
 static async Task<List<Categories>> ReadCategories()
 {
     string sCurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
-    string sFile = System.IO.Path.Combine(sCurrentDirectory, @"..\..\..\" + "Categories.json");
+    string sFile = System.IO.Path.Combine(Environment.CurrentDirectory,"Categories.json");
     string sFilePath = Path.GetFullPath(sFile);
     string jsonString = await File.ReadAllTextAsync(sFilePath);
     List<Categories>? menu = System.Text.Json.JsonSerializer.Deserialize<List<Categories>>(jsonString);
@@ -241,7 +243,7 @@ static async Task<List<Categories>> ReadCategories()
 static async void UpdateFile(List<Recipe> newRecipes)
 {
     string sCurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
-    string sFile = System.IO.Path.Combine(sCurrentDirectory, @"..\..\..\" + "Text.json");
+    string sFile = System.IO.Path.Combine(Environment.CurrentDirectory,"Text.json");
     string sFilePath = Path.GetFullPath(sFile);
     var options = new JsonSerializerOptions { WriteIndented = true };
     File.WriteAllText(sFilePath, System.Text.Json.JsonSerializer.Serialize(newRecipes));
@@ -251,7 +253,7 @@ static async void UpdateFile(List<Recipe> newRecipes)
 static async void UpdateCategories(List<Categories> newRecipes)
 {
     string sCurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
-    string sFile = System.IO.Path.Combine(sCurrentDirectory, @"..\..\..\" + "Categories.json");
+    string sFile = System.IO.Path.Combine(Environment.CurrentDirectory, "Categories.json");
     string sFilePath = Path.GetFullPath(sFile);
     var options = new JsonSerializerOptions { WriteIndented = true };
     File.WriteAllText(sFilePath, System.Text.Json.JsonSerializer.Serialize(newRecipes));
