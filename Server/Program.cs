@@ -36,7 +36,7 @@ app.UseSwaggerUI(options =>
 });
 
 // Adding a recipe.
-app.MapPost("recipes/add-recipe", async (HttpContext context, IAntiforgery antiforgery,Recipe recipe) =>
+app.MapPost("recipes/add-recipe", async (Recipe recipe) =>
 {
     List<Recipe> recipes = await ReadFile();
     if (recipes.Any())
@@ -56,7 +56,8 @@ app.MapPut("recipes/edit-recipe/{id}", async (Guid id, Recipe editedRecipe) =>
     int index = recipes.FindIndex(r => r.Id == id);
     if(index!=-1)
     {
-        recipes[index]=editedRecipe;
+       recipes[index]=editedRecipe;
+       recipes[index].Categories.Sort((x, y) => string.Compare(x, y));;
        UpdateFile(recipes);
        return Results.Ok(recipes.Find(r => r.Id == id));
     }
@@ -101,6 +102,7 @@ app.MapPost("recipes/add-category", async (Categories category) =>
         if(categories.FindIndex(c=>c.Name==category.Name) ==-1)
         { 
             categories.Add(category);
+            categories.Sort((x, y) => string.Compare(x.Name, y.Name));
             UpdateCategories(categories);
             return Results.Created("Successfully added a category",category);
         }
@@ -131,6 +133,7 @@ app.MapPut("categories/rename-category", async (string oldName, string newName) 
         if(categories.FindIndex(c=>c.Name==newName) ==-1)
         {
             categories[index].Name = newName;
+            categories.Sort((x, y) => string.Compare(x.Name, y.Name));
             UpdateCategories(categories);
             
             // Renaming category in the recipes file.
@@ -144,6 +147,7 @@ app.MapPut("categories/rename-category", async (string oldName, string newName) 
                     if (i != -1)
                     {
                         r.Categories[i] = newName;
+                        r.Categories.Sort((x, y) => string.Compare(x, y));
                     }
                 }
                 UpdateFile(recipes);
