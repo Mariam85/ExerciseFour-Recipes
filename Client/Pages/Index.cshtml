@@ -31,7 +31,7 @@
                     <input type="text" style="font-family: Arial; box-shadow: #ff0000; outline: none; background: transparent; border-top-style: hidden; border-right-style: hidden; border-left-style: hidden; border-bottom-style: groove; " id="myFilter" class="form-control" onkeyup="myFunction()" placeholder="Search for a recipe...">
                 </div>
             </header>
-            <button class="button--nina" style="border-radius: 12px;font-family: Arial;" data-bs-toggle="modal" data-bs-target="#createRecipeModal">
+            <button class="button--nina" style="font-family: Arial;" data-bs-toggle="modal" data-bs-target="#createRecipeModal">
                 <svg class="bi bi-type-bold" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                     <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
                 </svg>Add
@@ -40,9 +40,9 @@
                  " data-bs-ride="carousel" style="height: 450px;">
                 <div class="container" id="myProducts">
                     <template x-for="recipe in recipes">
-                        <div class="hover-zoom carousel-inner">
+                        <div class="hover-zoom carousel-inner " style="margin: auto;">
                             <div class="item active">
-                                <button style="border-radius: 12px;height: 400px;" class="border-0 mt-3 zoom  cards  card-body border-1" data-bs-toggle="modal" :data-bs-target="'#detailsModal' + recipe.id">
+                                <button style="border-radius: 12px;height: 400px;" class="mx-auto border-0 mt-3 zoom  cards  card-body border-1" data-bs-toggle="modal" :data-bs-target="'#detailsModal' + recipe.id">
                                     <h4 x-text="recipe.title" class="cta card-title" style="color:black"></h4>
                                     <template x-for="category in recipe.categories">
                                         <span style="text-align:left; background-color:#00008B" class="badge mb-2 mx-1" x-text="category"></span>
@@ -94,7 +94,7 @@
                                                         <template x-for="category in availablecategories ">
                                                             <div>
                                                                 <input :id="'category'+ category.name + recipe.id" type="checkbox" :value="category.name" x-model="recipe.categories">
-                                                                <label :for="'category'+ category.name + recipe.id" x-text="category.name"></label>
+                                                                <label style="pointer-events: none;" :for="'category'+ category.name + recipe.id" x-text="category.name"></label>
                                                                 <br />
                                                             </div>
                                                         </template>
@@ -102,7 +102,7 @@
                                                 </div>
                                             </div>
                                             <div class="modal-footer">
-                                                <button data-bs-dismiss="modal" type="submit" id="button" class="btn btn-primary">Edit</button>
+                                                <button type="submit" id="button" class="btn btn-primary">Edit</button>
                                             </div>
                                         </form>
                                     </div>
@@ -185,7 +185,7 @@
                                                         <template x-for="category in availablecategories">
                                                             <div>
                                                                 <input :id="'category'+ category.name + recipe.id" type="checkbox" :value="category.name" x-model="recipe.categories">
-                                                                <label :for="'category'+ category.name + recipe.id" x-text="category.name"></label>
+                                                                <label style="pointer-events: none;" :for="'category'+ category.name + recipe.id" x-text="category.name" disabled></label>
                                                                 <br />
                                                             </div>
                                                         </template>
@@ -193,7 +193,7 @@
                                                 </div>
                                             </div>
                                             <div class="modal-footer">
-                                                <button type="submit" data-bs-dismiss="modal" class="btn btn-primary">
+                                                <button type="submit" class="btn btn-primary">
                                                     Add
                                                 </button>
                                             </div>
@@ -245,7 +245,7 @@
             <header role="banner">
                 <h1 style="font-family: Lucida Sans Unicode;">Find and share categories</h1>
             </header>
-            <button class="button--nina" style="border-radius: 12px;font-family: Arial;" data-bs-toggle="modal" :data-bs-target="'#addCategoryModal'">
+            <button class="button--nina" style="font-family: Arial;" data-bs-toggle="modal" :data-bs-target="'#addCategoryModal'">
                 <svg class="bi bi-type-bold" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
                     <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
                 </svg>Add
@@ -380,7 +380,7 @@
         Alpine.store('cat', getCategories());
     });
 
-    // Search for a recipe.
+    // Search functon.
     function myFunction() {
         var input, filter, cards, cardContainer, title, i;
         input = document.getElementById("myFilter");
@@ -438,6 +438,7 @@
                     confirmButtonColor: '#0275d8'
 
                 });
+                $('#createRecipeModal').modal('hide');
                 Alpine.store('recipes', getRecipes());
             }
             else {
@@ -502,7 +503,8 @@
                     text: 'recipe is successfuly edited!',
                     icon: 'success',
                     confirmButtonColor: '#0275d8'
-                })
+                });
+                $('#editModal' + recipe.id).modal('hide');
             }
             else
             {
