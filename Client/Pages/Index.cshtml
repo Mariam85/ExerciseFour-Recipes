@@ -17,32 +17,39 @@
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
-<body style="background: url('https://images.unsplash.com/photo-1614548539644-ef528186523a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80')no-repeat; background-size: cover;">
+<body style="background: url('https://images.unsplash.com/photo-1614548539644-ef528186523a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80');
+      height: auto;
+      background-repeat: no-repeat;
+      background-size: cover;
+      padding-right:inherit;
+      overflow-x:hidden;
+      ">
     @* Recipes*@
     <div x-show="tab == 'recipes'">
         <div x-effect="recipes = await $store.recipes;"
              x-data="{ recipes: [] }">
             <header role="banner">
-                <h1 style="top: 60px; font-family: Lucida Sans Unicode;">Find and share recipes</h1>
-                <div class="input-group-text" style="border: none; background: transparent; width: 450px; padding: 15px; position: absolute; top: 60px; right: 50px; ">
+                <div>
+                    <h1 style="top: 60px; font-family: Lucida Sans Unicode;">Find and share recipes</h1>
+                    <button class="button--nina" style="font-family: Arial; display: inline-block; margin-right: 10px;" data-bs-toggle="modal" data-bs-target="#createRecipeModal">
+                        <svg class="bi bi-type-bold" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
+                        </svg>Add
+                    </button>
+                </div>
+                <div class="input-group-text" style="border: none; background: transparent; width: 450px; padding: 15px; margin-left: auto;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
                         <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
                     </svg>
                     <input type="text" style="font-family: Arial; box-shadow: #ff0000; outline: none; background: transparent; border-top-style: hidden; border-right-style: hidden; border-left-style: hidden; border-bottom-style: groove; " id="myFilter" class="form-control" onkeyup="myFunction()" placeholder="Search for a recipe...">
                 </div>
             </header>
-            <button class="button--nina" style="font-family: Arial;" data-bs-toggle="modal" data-bs-target="#createRecipeModal">
-                <svg class="bi bi-type-bold" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
-                </svg>Add
-            </button>
-            <div id="carousel" class="hover-zoom text-center carousel slide
-                 " data-bs-ride="carousel" style="height: 450px;">
+            <div id="carousel" class="hover-zoom text-center carousel slide container" data-bs-ride="carousel" style="height: 550px;">
                 <div class="container" id="myProducts">
                     <template x-for="recipe in recipes">
                         <div class="hover-zoom carousel-inner " style="margin: auto;">
                             <div class="item active">
-                                <button style="border-radius: 12px;height: 400px;" class="mx-auto border-0 mt-3 zoom  cards  card-body border-1" data-bs-toggle="modal" :data-bs-target="'#detailsModal' + recipe.id">
+                                <button style="border-radius: 12px; height: 500px;width:600px;" class="mx-auto border-0 mt-3 zoom  cards  card-body border-1" data-bs-toggle="modal" :data-bs-target="'#detailsModal' + recipe.id">
                                     <h4 x-text="recipe.title" class="cta card-title" style="color:black"></h4>
                                     <template x-for="category in recipe.categories">
                                         <span style="text-align:left; background-color:#00008B" class="badge mb-2 mx-1" x-text="category"></span>
